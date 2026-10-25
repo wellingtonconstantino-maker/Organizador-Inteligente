@@ -1,0 +1,85 @@
+name: Compilar instaladores Windows e Linux
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '*.py'
+      - '*.pyw'
+      - '*.png'
+      - 'requirements-build.txt'
+      - 'Instalador_Constantino.iss'
+      - 'build_linux.sh'
+      - '.github/workflows/build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows - instalador e portatil
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-build.txt
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements-build.txt
+      - name: Compilar executavel
+        run: python -m PyInstaller --noconfirm --clean --windowed --name ConstantinoOrganizador --add-data "constantino_emblema.png;." constantino.py
+      - name: Instalar Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+      - name: Criar instalador
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "Instalador_Constantino.iss"
+      - name: Publicar instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-instalador-EXE
+          path: INSTALADOR_PRONTO/*.exe
+          if-no-files-found: error
+      - name: Publicar portatil
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-executavel-portatil
+          path: dist/ConstantinoOrganizador/
+          if-no-files-found: error
+
+  linux:
+    name: Linux - DEB e portatil
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-build.txt
+      - name: Instalar bibliotecas do sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libopengl0 libxcb-cursor0 libxkbcommon-x11-0
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements-build.txt
+      - name: Compilar executavel
+        run: python -m PyInstaller --noconfirm --clean --windowed --name constantino-organizador --add-data "constantino_emblema.png:." constantino.py
+      - name: Criar pacotes
+        run: bash build_linux.sh
+      - name: Publicar DEB
+        uses: actions/upload-artifact@v4
+        with:
+          name: Linux-instalador-DEB
+          path: output/*.deb
+          if-no-files-found: error
+      - name: Publicar portatil
+        uses: actions/upload-artifact@v4
+        with:
+          name: Linux-executavel-portatil
+          path: output/*.tar.gz
+          if-no-files-found: error

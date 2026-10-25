@@ -1,5 +1,5 @@
 #define AppName "Constantino Software - Organizador Inteligente"
-#define AppVersion "0.9.1-teste"
+#define AppVersion "0.10.0-beta"
 #define AppExe "ConstantinoOrganizador.exe"
 [Setup]
 AppId={{A2A8EB62-3E0D-42B4-BFB0-A83E5F2218A7}
@@ -9,7 +9,7 @@ AppPublisher=Constantino Software
 DefaultDirName={localappdata}\Programs\Constantino Software
 DefaultGroupName=Constantino Software
 OutputDir=INSTALADOR_PRONTO
-OutputBaseFilename=Instalar_Constantino_Software_0_9_1_teste
+OutputBaseFilename=Instalar_Constantino_Software_0_10_0_beta
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest

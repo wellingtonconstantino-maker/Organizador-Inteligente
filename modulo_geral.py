@@ -156,11 +156,17 @@ class Main(QMainWindow):
         body=QWidget();b=QVBoxLayout(body);b.setContentsMargins(30,9,30,7);b.setSpacing(6)
         controls=QHBoxLayout();controls.setSpacing(9)
         self.choose=QPushButton('Selecionar pasta / HD');self.choose.clicked.connect(self.select_folder);controls.addWidget(self.choose)
+        self.clearbtn=QPushButton('Limpar pesquisa');self.clearbtn.setToolTip('Limpar resultados e seleção sem apagar arquivos');self.clearbtn.clicked.connect(self.clear_search);controls.addWidget(self.clearbtn)
         self.recursive=QCheckBox('Incluir subpastas');self.recursive.setChecked(True);controls.addWidget(self.recursive)
         self.pathlabel=QLineEdit();self.pathlabel.setReadOnly(True);self.pathlabel.setPlaceholderText('Nenhuma pasta selecionada')
         self.pathlabel.setMinimumWidth(180);controls.addWidget(self.pathlabel,1)
         self.scanbtn=QPushButton('Analisar arquivos e identificar duplicatas');self.scanbtn.setObjectName('primary');self.scanbtn.clicked.connect(self.scan);controls.addWidget(self.scanbtn)
         b.addLayout(controls)
+        extras=QHBoxLayout()
+        self.deepbtn=QPushButton('Pesquisa profunda (fotos, PDF e CBZ)');self.deepbtn.clicked.connect(self.deep_scan);extras.addWidget(self.deepbtn)
+        self.photosbtn=QPushButton('Organizar fotografias por ano');self.photosbtn.clicked.connect(self.organize_photos);extras.addWidget(self.photosbtn)
+        self.undobtn=QPushButton('Desfazer organização das fotos');self.undobtn.clicked.connect(self.undo_photos);extras.addWidget(self.undobtn)
+        b.addLayout(extras)
         pr=QHBoxLayout();self.bar=QProgressBar();self.bar.setTextVisible(False);pr.addWidget(self.bar,1);self.percent=QLabel('0%');pr.addWidget(self.percent);b.addLayout(pr)
         metrics=QHBoxLayout();self.metrics={}
         for key in ('Arquivos identificados','Categorias','Duplicatas excedentes','Espaço recuperável'):
@@ -192,8 +198,78 @@ class Main(QMainWindow):
         layout.addWidget(body,1)
         footer=QFrame();footer.setStyleSheet('background:#fbfcfe;border-top:1px solid #dce5f1;');fl=QHBoxLayout(footer);fl.setContentsMargins(24,8,24,8)
         self.status=QLabel('●  Pronto');fl.addWidget(self.status);fl.addStretch()
-        credit=QLabel('Idealizador e proprietário: Wellington L. Constantino   |   Software desenvolvido em C++ e Python   |   v0.9.1')
+        credit=QLabel('Idealizador e proprietário: Wellington L. Constantino   |   Software desenvolvido em Python   |   v0.9.1')
         credit.setAlignment(Qt.AlignmentFlag.AlignRight);credit.setObjectName('muted');fl.addWidget(credit);layout.addWidget(footer)
+    def clear_search(self):
+        if getattr(self,'worker',None) is not None and self.worker.isRunning():
+            QMessageBox.information(self,'Aguarde','A análise ainda está em andamento.');return
+        if getattr(self,'deepworker',None) is not None and self.deepworker.isRunning():
+            QMessageBox.information(self,'Aguarde','A pesquisa profunda ainda está em andamento.');return
+        self.reset_results();self.folder=None;self.pathlabel.clear()
+
+    def deep_scan(self):
+        if not self.folder:
+            QMessageBox.information(self,'Pasta','Selecione uma pasta primeiro.');return
+        from analise_profunda import DeepWorker
+        self.deepbtn.setEnabled(False)
+        self.status.setText('● Pesquisa profunda em andamento...')
+        self.deepworker=DeepWorker(self.folder)
+        self.deepworker.progress.connect(lambda n,t:(self.bar.setValue(round(100*n/max(t,1))),self.percent.setText(f'{round(100*n/max(t,1))}%')))
+        self.deepworker.completed.connect(self.deep_done)
+        self.deepworker.start()
+
+    def deep_done(self,results,errors):
+        self.deepbtn.setEnabled(True)
+        self.status.setText(f'● Pesquisa profunda: {len(results)} pares para revisão; {len(errors)} erros')
+        dlg=QDialog(self);dlg.setWindowTitle('Pesquisa profunda — candidatos, sem exclusão');dlg.resize(1100,650)
+        lay=QVBoxLayout(dlg)
+        lay.addWidget(QLabel(f'{len(results)} pares potencialmente equivalentes. Nenhum arquivo será movido ou excluído.'))
+        table=QTableWidget(len(results),4);table.setHorizontalHeaderLabels(['Classificação','Arquivo 1','Arquivo 2','Evidência'])
+        table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        for i,row in enumerate(results):
+            for j,val in enumerate(row):table.setItem(i,j,QTableWidgetItem(str(val)))
+        lay.addWidget(table)
+        export=QPushButton('Exportar candidatos CSV')
+        def save_deep():
+            path,_=QFileDialog.getSaveFileName(dlg,'Salvar relatório','pesquisa_profunda.csv','CSV (*.csv)')
+            if path:
+                with open(path,'w',newline='',encoding='utf-8-sig') as out:
+                    w=csv.writer(out,delimiter=';');w.writerow(['classificacao','arquivo1','arquivo2','evidencia']);w.writerows(results)
+        export.clicked.connect(save_deep);lay.addWidget(export)
+        if errors:lay.addWidget(QLabel(f'{len(errors)} arquivos não puderam ser examinados.'))
+        dlg.exec()
+
+    def organize_photos(self):
+        if not self.folder:
+            QMessageBox.information(self,'Pasta','Selecione uma pasta primeiro.');return
+        from organizar_fotos import plan,execute
+        try:rows=plan(self.folder)
+        except OSError as e:QMessageBox.warning(self,'Erro',str(e));return
+        if not rows:QMessageBox.information(self,'Fotografias','Nenhuma fotografia encontrada.');return
+        from collections import Counter
+        counts=Counter(dst.parent.name for _,dst,_ in rows)
+        approx=sum(source!='EXIF' for _,_,source in rows)
+        detail='\n'.join(f'{y}: {n} foto(s)' for y,n in sorted(counts.items()))
+        answer=QMessageBox.question(self,'Prévia — organização de fotografias',
+            f'{len(rows)} fotografias serão MOVIDAS para Fotografias organizadas/ANO.\n'
+            f'{approx} usarão a data de modificação (não EXIF).\n\n{detail}\n\n'
+            'As pastas de músicas e HQs não serão alteradas. Confirmar?',
+            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,QMessageBox.StandardButton.No)
+        if answer!=QMessageBox.StandardButton.Yes:return
+        manifest,done,errors=execute(self.folder,rows)
+        self.reset_results()
+        QMessageBox.information(self,'Organização concluída',f'{len(done)} fotografias movidas; {len(errors)} falhas.\nManifesto: {manifest}\nUse Desfazer organização para restaurar.')
+
+    def undo_photos(self):
+        from organizar_fotos import undo
+        path,_=QFileDialog.getOpenFileName(self,'Escolher manifesto de organização',self.folder or str(Path.home()),'Manifesto CSV (manifesto_organizacao_*.csv)')
+        if not path:return
+        if QMessageBox.question(self,'Desfazer organização','Restaurar fotografias aos caminhos originais?',QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,QMessageBox.StandardButton.No)!=QMessageBox.StandardButton.Yes:return
+        try:done,errors=undo(path)
+        except Exception as e:QMessageBox.warning(self,'Erro',str(e));return
+        self.reset_results();QMessageBox.information(self,'Restauração',f'{len(done)} fotografias restauradas; {len(errors)} falhas.')
+
     def reset_results(self):
         # Limpa somente os resultados da consulta anterior; não altera arquivos nem quarentena.
         self.rows=[]

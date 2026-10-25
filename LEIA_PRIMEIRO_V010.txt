@@ -1,0 +1,31 @@
+CONSTANTINO SOFTWARE v0.10.0 BETA — PACOTE DE CÓDIGO PARA COMPILAÇÃO
+
+IMPLEMENTADO NESTE PACOTE:
+- Abas com identificação e contraste visual do módulo ativo.
+- Dez ícones PNG incluídos no pacote e nos comandos PyInstaller.
+- Botão 'Limpar pesquisa' no módulo Geral (não exclui arquivos).
+- Organização de fotografias por ano, com prévia, manifesto CSV e desfazer.
+- Pesquisa profunda conservadora: similaridade visual de fotos, equivalência de texto de PDF e páginas inicial/final de CBZ.
+- Preservação das pastas de músicas e HQs durante a organização de fotos.
+- Workflow GitHub Actions para gerar instalador Windows e DEB Linux.
+
+LIMITAÇÕES IMPORTANTES:
+- Pesquisa profunda ainda não analisa conteúdo de músicas, CBR, vídeos, ou versões de documentos DOCX.
+- Candidatos semelhantes são SOMENTE apresentados para revisão, não excluídos.
+- A função de quarentena existente atua sobre duplicatas EXATAS verificadas por SHA-256.
+- Fotos sem EXIF utilizam data de modificação, que pode ser diferente da data da foto.
+- Não foi realizado teste de GUI (PySide6 indisponível neste ambiente), nem compilação de instaladores Windows/Linux.
+- Foram executados testes de sintaxe Python e de mover/restaurar fotografias em pasta temporária.
+- Use cópias de arquivos para o primeiro teste, nunca a coleção original.
+
+PARA ATUALIZAR O GITHUB:
+1. Extraia este ZIP no computador.
+2. Substitua na raiz do repositório os arquivos .py, requirements-build.txt,
+   Instalador_Constantino.iss e build_linux.sh.
+3. Envie as pastas 'icones' e '.github/workflows/build.yml' (preserve a estrutura).
+4. Commit changes; vá em Actions > Compilar Constantino Windows e Linux > Run workflow.
+5. Ao concluir, baixe Windows-instalador-EXE ou Linux-instalador-DEB em Artifacts.
+6. Desinstale a versão anterior antes de instalar a nova; faça backup de dados importantes.
+
+OBSERVAÇÃO: O projeto é BETA. Não representa implementação integral de todas as
+funcionalidades de limpeza profunda solicitadas.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 mkdir -p output
-VERSION=0.9.1
+VERSION=0.10.0
 PKG="$(mktemp -d)"
 trap 'rm -rf "$PKG"' EXIT
 mkdir -p "$PKG/DEBIAN" "$PKG/opt/constantino-software" "$PKG/usr/bin" "$PKG/usr/share/applications"
@@ -22,7 +22,7 @@ Categories=Utility;Education;
 EOF
 cat > "$PKG/DEBIAN/control" <<'EOF'
 Package: constantino-organizador
-Version: 0.9.1
+Version: 0.10.0
 Section: utils
 Priority: optional
 Architecture: amd64

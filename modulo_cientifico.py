@@ -431,7 +431,7 @@ class Main(QMainWindow):
         f=QHBoxLayout(footer);f.setContentsMargins(24,9,24,9)
         self.status=QLabel('●  Pronto');self.status.setObjectName('muted');f.addWidget(self.status)
         f.addStretch()
-        credit=QLabel('Idealizador e proprietário: Wellington L. Constantino   |   Software desenvolvido em C++ e Python   |   v0.9.1')
+        credit=QLabel('Idealizador e proprietário: Wellington L. Constantino   |   Software desenvolvido em Python   |   v0.9.1')
         credit.setObjectName('credit');f.addWidget(credit)
         layout.addWidget(footer)
         self.paths=[];self.folder_path=None;self.records=[];self.matches=[];self.report=[];self.row_files=[]

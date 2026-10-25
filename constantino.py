@@ -1,70 +1,35 @@
-"""Constantino Software - interface unificada, navegacao de modulos destacada."""
+"""Constantino Software — interface unificada e identificação inequívoca do módulo."""
 import sys
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QLabel, QWidget, QHBoxLayout, QVBoxLayout
-from modulo_geral import Main as Geral, quarantine_root
+from PySide6.QtWidgets import QApplication,QMainWindow,QTabWidget
+from modulo_geral import Main as Geral,quarantine_root
 from modulo_cientifico import Main as Cientifico
 
 class Constantino(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.resize(1480, 900)
-        self.setMinimumSize(1020, 650)
-        self.setWindowTitle('Constantino Software | Organizador Inteligente - Modulo Geral')
-        root = QWidget(self)
-        root.setStyleSheet('background-color: #eef3fa;')
-        layout = QVBoxLayout(root)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        banner = QWidget()
-        banner.setObjectName('moduleBanner')
-        banner.setStyleSheet('QWidget#moduleBanner {background-color:#0d3765;}')
-        banner_layout = QHBoxLayout(banner)
-        banner_layout.setContentsMargins(20, 11, 20, 11)
-        self.module_title = QLabel('MODULO ATIVO: ARQUIVOS GERAIS')
-        self.module_title.setStyleSheet('color:white; font-size:18px; font-weight:800; background:transparent;')
-        self.module_hint = QLabel('Organizacao de fotografias e analise de arquivos')
-        self.module_hint.setStyleSheet('color:#d5e9ff; font-size:12px; background:transparent;')
-        banner_layout.addWidget(self.module_title)
-        banner_layout.addStretch()
-        banner_layout.addWidget(self.module_hint)
-        layout.addWidget(banner)
-        self.tabs = QTabWidget()
+        self.resize(1480,900)
+        self.tabs=QTabWidget(self)
         self.tabs.setDocumentMode(False)
         self.tabs.setStyleSheet('''
-            QTabWidget::pane { border:0; background:#eef3fa; }
-            QTabBar { background:#e6edf7; }
-            QTabBar::tab { background:#dfe8f4; color:#365474; padding:15px 34px;
-                           min-width:190px; font-size:15px; font-weight:700;
-                           border-right:1px solid #c6d3e3; border-bottom:4px solid #c4d2e4; }
-            QTabBar::tab:selected { background:#ffffff; color:#063d78;
-                                    border-bottom:5px solid #1373d1; font-weight:900; }
-            QTabBar::tab:hover:!selected { background:#c9dff5; color:#123f70; }
+        QTabWidget::pane {border:0;border-top:3px solid #1a65b9;}
+        QTabBar::tab {background:#e6ebf3;color:#435a74;padding:14px 34px;
+          font:700 15px 'Segoe UI';border:1px solid #c7d5e8;margin-right:5px;min-width:175px;}
+        QTabBar::tab:selected {background:#155db5;color:white;border:2px solid #0e4a93;}
+        QTabBar::tab:hover:!selected {background:#d0e2f8;color:#163e6e;}
         ''')
-        self.geral = Geral()
-        self.cientifico = Cientifico()
-        self.geral.setWindowFlags(Qt.WindowType.Widget)
-        self.cientifico.setWindowFlags(Qt.WindowType.Widget)
-        self.tabs.addTab(self.geral, '  ARQUIVOS GERAIS  ')
-        self.tabs.addTab(self.cientifico, '  CIENTIFICO  ')
-        self.tabs.currentChanged.connect(self.update_active_module)
-        layout.addWidget(self.tabs, 1)
-        self.setCentralWidget(root)
-        self.update_active_module(0)
+        self.geral=Geral();self.cientifico=Cientifico()
+        for w in (self.geral,self.cientifico):w.setWindowFlags(Qt.Widget)
+        self.tabs.addTab(self.geral,'  MÓDULO GERAL  ')
+        self.tabs.addTab(self.cientifico,'  MÓDULO CIENTÍFICO  ')
+        self.setCentralWidget(self.tabs)
+        self.tabs.currentChanged.connect(self.update_title)
+        self.update_title(0)
+    def update_title(self,index):
+        self.setWindowTitle('Constantino Software | '+('MÓDULO GERAL — Arquivos e fotografias' if index==0 else 'MÓDULO CIENTÍFICO — Artigos e referências')+' | v0.10.0 beta')
 
-    def update_active_module(self, index):
-        if index == 0:
-            self.module_title.setText('MODULO ATIVO: ARQUIVOS GERAIS')
-            self.module_hint.setText('Fotografias, arquivos e duplicatas')
-            self.setWindowTitle('Constantino Software | Organizador Inteligente - Arquivos Gerais')
-        else:
-            self.module_title.setText('MODULO ATIVO: CIENTIFICO')
-            self.module_hint.setText('Artigos cientificos, referencias e duplicatas')
-            self.setWindowTitle('Constantino Software | Organizador Inteligente - Cientifico')
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
+if __name__=='__main__':
+    app=QApplication(sys.argv)
     quarantine_root()
-    window = Constantino()
-    window.show()
+    window=Constantino();window.show()
     sys.exit(app.exec())

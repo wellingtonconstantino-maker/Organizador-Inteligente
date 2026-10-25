@@ -1,0 +1,12 @@
+INSTALADOR WINDOWS - CONSTANTINO SOFTWARE 0.9.0 (TESTE)
+
+Este pacote NAO contem um instalador .exe pronto.
+Para gerar um instalador Windows (somente uma vez, na maquina que o compila):
+1. Instale Python e Inno Setup 6 (gratuito).
+2. Clique duas vezes em CRIAR_INSTALADOR_WINDOWS.bat (nao precisa abrir CMD).
+3. Aguarde a compilacao; o instalador aparecera em INSTALADOR_PRONTO.
+4. Depois, o instalador gerado funciona por duplo clique sem Python nem CMD no computador de destino.
+
+Se Inno Setup nao estiver instalado, o script gera o programa executavel em dist\ConstantinoOrganizador\, mas nao um instalador.
+
+ATENCAO: a versao 0.9.0 ainda nao implementa comparacao avancada de conteudo/qualidade. Quarentena experimental; testar somente com arquivos descartaveis.

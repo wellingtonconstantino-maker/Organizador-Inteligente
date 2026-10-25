@@ -1,0 +1,23 @@
+CONSTANTINO SOFTWARE - PACOTES DE INSTALACAO (BASE 0.9.1)
+
+Este ZIP CONTEM O CODIGO E A AUTOMACAO DE COMPILACAO.
+NAO CONTEM EXE OU DEB JA COMPILADOS.
+
+COMO GERAR SEM CMD NO SEU COMPUTADOR:
+1. Crie um repositorio PRIVADO no GitHub e envie o conteudo deste ZIP.
+2. Abra a aba Actions no repositorio.
+3. Escolha "Compilar instaladores Windows e Linux" e clique em "Run workflow".
+4. Ao terminar, baixe os 4 arquivos na secao Artifacts:
+   - Windows-instalador-EXE (instalacao padrao)
+   - Windows-executavel-portatil (sem instalacao)
+   - Linux-instalador-DEB (Ubuntu/Debian x86_64)
+   - Linux-executavel-portatil (tar.gz)
+
+O instalador Windows nao e assinado digitalmente e o Smart App Control
+pode bloquea-lo. NAO desligue a protecao para contornar o bloqueio.
+O pacote Linux .deb nao e assinado. A compatibilidade varia por distribuicao.
+O workflow precisa de acesso a internet para baixar dependencias.
+
+ATENCAO: A versao 0.9.1 ainda NAO possui o comparador avancado
+MP3/WAV/CBR/CBZ/PDF. Quarentena experimental; teste com arquivos descartaveis.
+Nao ha garantias de funcionamento ate teste em Windows e Linux reais.

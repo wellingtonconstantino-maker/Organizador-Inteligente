@@ -1,0 +1,14 @@
+CONSTANTINO SOFTWARE — INTEGRAÇÃO 0.9.1 (TESTE)
+
+Para abrir sem CMD: extraia todo o ZIP, depois dê dois cliques em ABRIR_CONSTANTINO.pyw.
+Requer Python e PySide6 previamente instalados.
+Se não abrir, execute constantino.py pelo Python para ver o erro.
+
+CORREÇÕES:
+- Cabeçalho do módulo científico agora usa o mesmo emblema e nome do módulo geral.
+- Ícones científicos decorativos PNG incluídos.
+- Quarentena geral persistente em AppData\Local\Constantino Software\Quarentena_Constantino.
+- Arquivos de instalação continuam sendo ferramentas de build, NÃO instalador EXE pronto.
+
+LIMITAÇÕES: comparação profunda de áudio/HQs/PDFs não implementada; quarentena experimental.
+Não desative proteções do Windows.

@@ -1,4 +1,4 @@
-"""Constantino Software - Organizador Geral v0.9.1 (layout corrigido e quarentena em lote)."""
+"""Constantino Software - Organizador Geral v0.10.0 (layout corrigido e quarentena em lote)."""
 import csv
 import hashlib
 import os
@@ -124,7 +124,7 @@ QHeaderView::section {background:#e8f1fb;color:#143b6d;font-weight:800;border:0;
 '''
 class Main(QMainWindow):
     def __init__(self):
-        super().__init__();self.setWindowTitle('Organizador Inteligente — Módulo Geral v0.9.1 | Constantino Software')
+        super().__init__();self.setWindowTitle('Organizador Inteligente — Módulo Geral v0.10.0 | Constantino Software')
         self.resize(1450,850);self.setStyleSheet(STYLE);self.folder=None;self.rows=[];self.errors=[];self.visible=[]
         center=QWidget();self.setCentralWidget(center);layout=QVBoxLayout(center);layout.setContentsMargins(0,0,0,0);layout.setSpacing(0)
         hero=QFrame();hero.setObjectName('hero');hl=QHBoxLayout(hero);hl.setContentsMargins(22,5,22,5);hl.setSpacing(14)
@@ -198,7 +198,7 @@ class Main(QMainWindow):
         layout.addWidget(body,1)
         footer=QFrame();footer.setStyleSheet('background:#fbfcfe;border-top:1px solid #dce5f1;');fl=QHBoxLayout(footer);fl.setContentsMargins(24,8,24,8)
         self.status=QLabel('●  Pronto');fl.addWidget(self.status);fl.addStretch()
-        credit=QLabel('Idealizador e proprietário: Wellington L. Constantino   |   Software desenvolvido em Python   |   v0.9.1')
+        credit=QLabel('Idealizador e proprietário: Wellington L. Constantino   |   Software desenvolvido em Python   |   v0.10.0')
         credit.setAlignment(Qt.AlignmentFlag.AlignRight);credit.setObjectName('muted');fl.addWidget(credit);layout.addWidget(footer)
     def clear_search(self):
         if getattr(self,'worker',None) is not None and self.worker.isRunning():

@@ -30,7 +30,7 @@ jobs:
       - name: Instalar dependencias
         run: python -m pip install -r requirements-build.txt
       - name: Compilar executavel
-       run: python -m PyInstaller --noconfirm --clean --windowed --name ConstantinoOrganizador --add-data "constantino_emblema.png;." --add-data "icones;icones" constantino.py
+        run: python -m PyInstaller --noconfirm --clean --windowed --name ConstantinoOrganizador --add-data "constantino_emblema.png;." --add-data "icones;icones" constantino.py
       - name: Instalar Inno Setup
         shell: pwsh
         run: choco install innosetup --yes --no-progress
